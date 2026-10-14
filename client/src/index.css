@@ -1,56 +1,337 @@
-:root {
-  --green: #1f4d43;
-  --green-dark: #163a32;
-  --brass: #b8862b;
-  --paper: #f4f5f2;
-  --ink: #1c2623;
-  --rule: #d8ded9;
-  --bs-primary: #1f4d43;
-  --bs-primary-rgb: 31, 77, 67;
-  --bs-body-font-family: 'Source Sans 3', system-ui, sans-serif;
-  --bs-body-color: #1c2623;
-  --bs-body-bg: #f4f5f2;
-  --bs-link-color: #1f4d43;
-  --bs-link-hover-color: #163a32;
+/* =====================================================================
+   Design system
+   ALL colours live here as CSS variables. Components and other CSS files
+   only use var(--...), never hex values.
+   THEMES: each theme sets only TWO colours (--brand-primary, --brand-accent) on <html data-theme="...">.
+   Every other brand shade below is DERIVED from them with color-mix(), so a theme never needs more.
+   ===================================================================== */
+
+/* ----- Theme presets (data-theme on <html>; nu-classic is the default) -----
+   Rule for every theme: the primary colour is used with WHITE text (all primaries are >= 7:1 on white);
+   the accent is only an accent (indicators, tints) or a background with DARK text, never text on white. */
+/* [data-theme] works on ANY element: on <html> it themes the whole app, on a small preview card
+   (Settings → Appearance) it themes only that card. */
+:root, [data-theme="nu-classic"] { --brand-primary: #3D398C; --brand-accent: #F5DA3E; }
+[data-theme="cobalt"]            { --brand-primary: #0047AB; --brand-accent: #FFB703; }
+[data-theme="royal-amethyst"]    { --brand-primary: #5B2A86; --brand-accent: #F2C14E; }
+[data-theme="heritage-green"]    { --brand-primary: #1F4D43; --brand-accent: #D4A73B; }
+[data-theme="crimson-scholar"]   { --brand-primary: #9B1C31; --brand-accent: #F4C95D; }
+[data-theme="midnight-navy"]     { --brand-primary: #1B2A49; --brand-accent: #4FD1C5; }
+[data-theme="teal-harbor"]       { --brand-primary: #0F5E66; --brand-accent: #FFB347; }
+[data-theme="slate-minimal"]     { --brand-primary: #334155; --brand-accent: #38BDF8; }
+
+/* The derived shades are recalculated on every element that has its own data-theme */
+:root, [data-theme] {
+  --brand-primary-700: color-mix(in srgb, var(--brand-primary) 80%, black); /* hover */
+  --brand-primary-800: color-mix(in srgb, var(--brand-primary) 65%, black); /* pressed */
+  --brand-primary-100: color-mix(in srgb, var(--brand-primary) 15%, white); /* borders of tinted areas */
+  --brand-primary-50: color-mix(in srgb, var(--brand-primary) 7%, white);   /* selected rows / hover backgrounds */
+  --brand-accent-600: color-mix(in srgb, var(--brand-accent) 85%, black);
+  --brand-accent-100: color-mix(in srgb, var(--brand-accent) 25%, white);
+  --brand-line: color-mix(in srgb, var(--brand-primary) 9%, white);   /* barely-there theme line under cards */
+  --brand-line-strong: color-mix(in srgb, var(--brand-primary) 28%, white); /* the same line on hover */
+  --brand-title: color-mix(in srgb, var(--brand-primary) 88%, black);  /* book titles in the theme colour (AA on white) */
+  --hover-tint: color-mix(in srgb, var(--brand-primary) 5%, white);    /* hover background of table / list ROWS */
 }
-h1, h2, h3, h4, h5, .brand { font-family: 'Libre Baskerville', Georgia, serif; }
-h1 { font-size: 1.75rem; } h2 { font-size: 1.4rem; } h3 { font-size: 1.15rem; }
 
-.btn-primary { --bs-btn-bg: var(--green); --bs-btn-border-color: var(--green); --bs-btn-hover-bg: var(--green-dark); --bs-btn-hover-border-color: var(--green-dark); --bs-btn-active-bg: var(--green-dark); --bs-btn-disabled-bg: var(--green); --bs-btn-disabled-border-color: var(--green); }
-.btn-outline-primary { --bs-btn-color: var(--green); --bs-btn-border-color: var(--green); --bs-btn-hover-bg: var(--green); --bs-btn-hover-border-color: var(--green); --bs-btn-active-bg: var(--green); }
-.form-control:focus, .form-select:focus { border-color: var(--green); box-shadow: 0 0 0 .2rem rgba(31, 77, 67, .2); }
-:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+:root {
+  /* Brand shades are derived from the 2 theme colours in the block above:
+     color-mix(in srgb, A x%, black) = A made darker; color-mix(in srgb, A x%, white) = a light tint of A */
 
-.topbar { background: var(--green); }
-.topbar .brand { color: #fff; font-size: 1.25rem; letter-spacing: .01em; }
-.topbar .nav-link { color: rgba(255,255,255,.78); }
-.topbar .nav-link:hover, .topbar .nav-link.active { color: #fff; box-shadow: inset 0 -2px 0 var(--brass); }
+  /* ----- Neutrals -----
+     Flat "surfaces instead of borders" look: the page is a very light grey, cards are pure white with
+     no border, and sections are separated by SPACE. --color-border is only a barely visible hairline
+     for places where two white areas touch (table rows, modal header/footer). */
+  --color-bg: #F4F5F7;             /* page background */
+  --color-surface: #FFFFFF;        /* cards, panels, modals */
+  --color-surface-alt: #F8F9FA;    /* table header, hover rows, inset blocks */
+  --color-fill: #EFF1F4;           /* filled inputs, secondary buttons, segmented track */
+  --color-fill-hover: #E6E9EE;
+  --color-border: #ECEEF1;         /* hairline */
+  --color-border-strong: #D5D9E0;  /* input border on hover */
+  --color-text: #262938;           /* main text: a soft near-black (pure black is tiring on many labels) */
+  --color-text-rgb: 38, 41, 56;
+  --color-text-soft: #474B5C;      /* controls, pills, side-card text: calmer than the main text (8:1 on white) */
+  --color-muted: #62667A;          /* the ONE muted text colour: 5.7:1 on white, 4.9:1 on the input fill (WCAG AA) */
+  --color-on-brand: #FFFFFF;
 
-.panel { background: #fff; border: 1px solid var(--rule); border-radius: 6px; }
-.stat { padding: 1rem 1.25rem; border-left: 4px solid var(--brass); background: #fff; border-radius: 0 6px 6px 0; border-top: 1px solid var(--rule); border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-.stat .num { font-family: 'Libre Baskerville', Georgia, serif; font-size: 1.9rem; line-height: 1.1; }
-.stat.alert-stat { border-left-color: #b3372c; }
+  /* ----- Semantic (text colour + light tint + border) — all text/tint pairs pass 4.5:1 ----- */
+  --success: #1E7B47;  --success-rgb: 30, 123, 71;  --success-bg: #E6F4EC; --success-border: #BFE3CD;
+  --warning: #8A5300;  --warning-rgb: 138, 83, 0;   --warning-bg: #FFF1DB; --warning-border: #F5D29A; /* amber, not brand gold */
+  --danger: #B42318;   --danger-rgb: 180, 35, 24;   --danger-bg: #FDECEA;  --danger-border: #F3C1BC; --danger-700: #8F1B12;
+  --danger-soft: #B5534A; /* lighter, less saturated red for gentle hints ("Max characters reached"); 4.9:1 on white */
+  --info: #1D5FA8;     --info-rgb: 29, 95, 168;     --info-bg: #E6F0FB;    --info-border: #BCD5F2;
 
-.book-row { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; padding: .9rem 1.1rem; border-bottom: 1px solid var(--rule); }
-.book-row:last-child { border-bottom: 0; }
-.book-title { font-family: 'Libre Baskerville', Georgia, serif; font-size: 1.02rem; margin: 0; }
-.meta { color: #5b6a64; font-size: .9rem; }
-.avail { font-weight: 600; font-size: .88rem; }
-.avail.in { color: #1f6b3a; } .avail.out { color: #b3372c; }
+  /* ----- Sidebar (white text on the primary colour) ----- */
+  --sidebar-bg: var(--brand-primary);
+  --sidebar-text: rgba(255, 255, 255, 0.8);
+  --sidebar-text-muted: rgba(255, 255, 255, 0.72);
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-active: rgba(255, 255, 255, 0.14);
+  --sidebar-divider: rgba(255, 255, 255, 0.14);
 
-.auth-wrap { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
-.auth-art { background: var(--green); display: flex; flex-direction: column; justify-content: flex-end; padding: 3rem; color: #fff; }
-.auth-art h1 { font-size: 2.4rem; max-width: 14ch; }
-.auth-art p { color: rgba(255,255,255,.8); max-width: 34ch; }
-.shelf { display: flex; align-items: flex-end; gap: 4px; border-bottom: 6px solid var(--brass); margin-bottom: 2rem; padding: 0 .25rem; }
+  /* ----- Effects: flat design, shadows only on floating layers ----- */
+  --shadow-overlay: 0 12px 32px rgba(var(--color-text-rgb), 0.12), 0 2px 6px rgba(var(--color-text-rgb), 0.06);
+  --focus-ring: 0 0 0 0.2rem color-mix(in srgb, var(--brand-primary) 25%, transparent);
+  /* Hover on CARDS: the card stays white and lifts a little (a soft shadow), so it never blends into
+     the page background (a tinted background looked like the page in some themes, e.g. NU blue) */
+  --shadow-hover: 0 1px 2px rgba(var(--color-text-rgb), 0.05), 0 8px 24px rgba(var(--color-text-rgb), 0.08);
+  --skeleton-base: #ECEEF4;
+  --skeleton-highlight: #F7F8FB;
+
+  /* ----- Shape, spacing (4px scale) and motion ----- */
+  /* Small, crisp corners everywhere (round shapes stay only for avatars, icon buttons and number badges) */
+  --radius-card: 6px;
+  --radius-control: 6px;
+  --radius-sm: 4px;
+  --radius-pill: 6px;   /* chips, badges, segmented controls, search (was fully round) */
+  --radius-round: 999px; /* number badges that must stay circular */
+  /* Type scale in px (12 / 13 / 14 / 16 / 20 / 24); body text is 14px */
+  --fs-xs: 12px; --fs-sm: 13px; --fs-base: 14px; --fs-md: 16px; --fs-lg: 20px; --fs-xl: 24px;
+  --control-h: 36px; --control-h-sm: 32px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px;
+  --ease: 150ms ease;
+
+  /* ----- Bootstrap mapped to the brand ----- */
+  --bs-body-font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Bootstrap gives tooltips/popovers this variable directly, so it must be Poppins too */
+  --bs-font-sans-serif: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bs-body-font-size: 14px;
+  --bs-body-color: var(--color-text);
+  --bs-body-color-rgb: var(--color-text-rgb);
+  --bs-body-bg: var(--color-bg);
+  --bs-heading-color: var(--color-text);
+  --bs-secondary-color: var(--color-muted);
+  --bs-border-color: var(--color-border);
+  --bs-border-radius: var(--radius-control);
+  --bs-border-radius-lg: var(--radius-card);
+  --bs-primary: var(--brand-primary);
+  --bs-primary-text-emphasis: var(--brand-primary-700);
+  --bs-primary-bg-subtle: var(--brand-primary-50);
+  --bs-primary-border-subtle: var(--brand-primary-100);
+  --bs-success: var(--success);  --bs-success-rgb: var(--success-rgb);
+  --bs-warning: var(--warning);  --bs-warning-rgb: var(--warning-rgb);
+  --bs-danger: var(--danger);    --bs-danger-rgb: var(--danger-rgb);
+  --bs-info: var(--info);        --bs-info-rgb: var(--info-rgb);
+  --bs-link-color: var(--brand-primary);
+  --bs-link-hover-color: var(--brand-primary-700);
+  --bs-focus-ring-color: color-mix(in srgb, var(--brand-primary) 25%, transparent);
+  --bs-form-invalid-color: var(--danger);
+  --bs-form-invalid-border-color: var(--danger);
+  --bs-form-valid-color: var(--success);
+  --bs-form-valid-border-color: var(--success);
+}
+
+/* ---------- Base ---------- */
+/* "Zoomed out a little": Bootstrap sizes everything in rem, so a 15px root (instead of 16px)
+   makes the whole interface about 6% smaller while keeping all proportions. */
+/* scrollbar-gutter: stable keeps the scrollbar's space reserved even when a page is short (e.g. while
+   a tab is loading), so the content never shifts sideways when the scrollbar appears/disappears */
+html { font-size: 15px; scrollbar-gutter: stable; }
+/* Poppins everywhere, also in places that do not inherit the body font by default */
+button, input, select, textarea, .tooltip, .popover, .toast, .dropdown-menu, .modal, .offcanvas, svg text { font-family: var(--bs-body-font-family); }
+/* Bootstrap colours links with an rgb() triplet that cannot follow a theme, so links use the variable directly */
+a { color: var(--brand-primary); }
+a:hover { color: var(--brand-primary-700); }
+.progress { --bs-progress-bar-bg: var(--brand-primary); --bs-progress-bg: var(--color-bg); }
+body { background: var(--color-bg); color: var(--color-text); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, h5, h6 { font-weight: 600; letter-spacing: -0.01em; }
+h1, .h4 { font-size: var(--fs-xl); } h2, .h5 { font-size: var(--fs-lg); } h3, .h6 { font-size: var(--fs-md); }
+.brand { font-weight: 700; letter-spacing: -0.02em; }
+.meta { color: var(--color-muted); font-size: var(--fs-sm); }
+.small, small { font-size: var(--fs-sm); }
+/* Numbers line up in columns (stats, tables, counters) */
+.num, .stat-value, .data-table td, .donut-total, .count-badge, .btn-count, .status-badge { font-variant-numeric: tabular-nums; }
+.min-w-0 { min-width: 0; }
+.min-h-0 { min-height: 0; }
+.text-muted, .text-body-secondary { color: var(--color-muted) !important; }
+.text-danger { color: var(--danger) !important; }
+.text-success { color: var(--success) !important; }
+
+/* Visible keyboard focus everywhere (mouse clicks do not show it, thanks to :focus-visible) */
+:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+
+/* ---------- Buttons (radius 8px, 150ms transitions on state changes only) ---------- */
+/* Same heights everywhere: 36px (32px small) */
+.btn { --bs-btn-border-radius: var(--radius-control); --bs-btn-font-weight: 500; --bs-btn-font-size: var(--fs-base); --bs-btn-padding-y: 0; min-height: var(--control-h); display: inline-flex; align-items: center; justify-content: center; --bs-btn-focus-box-shadow: var(--focus-ring); transition: background-color var(--ease), border-color var(--ease), color var(--ease), box-shadow var(--ease); }
+.btn-sm { --bs-btn-border-radius: var(--radius-sm); --bs-btn-font-size: var(--fs-sm); min-height: var(--control-h-sm); }
+.btn-link { min-height: 0; }
+.btn-primary {
+  --bs-btn-color: var(--color-on-brand); --bs-btn-bg: var(--brand-primary); --bs-btn-border-color: var(--brand-primary);
+  --bs-btn-hover-color: var(--color-on-brand); --bs-btn-hover-bg: var(--brand-primary-700); --bs-btn-hover-border-color: var(--brand-primary-700);
+  --bs-btn-active-color: var(--color-on-brand); --bs-btn-active-bg: var(--brand-primary-800); --bs-btn-active-border-color: var(--brand-primary-800);
+  --bs-btn-disabled-color: var(--color-on-brand); --bs-btn-disabled-bg: var(--brand-primary); --bs-btn-disabled-border-color: var(--brand-primary);
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--brand-primary); --bs-btn-border-color: var(--brand-primary);
+  --bs-btn-hover-color: var(--color-on-brand); --bs-btn-hover-bg: var(--brand-primary); --bs-btn-hover-border-color: var(--brand-primary);
+  --bs-btn-active-color: var(--color-on-brand); --bs-btn-active-bg: var(--brand-primary-700); --bs-btn-active-border-color: var(--brand-primary-700);
+  --bs-btn-disabled-color: var(--brand-primary); --bs-btn-disabled-border-color: var(--brand-primary);
+}
+/* Secondary button: a soft neutral fill, no border (the brand colour is kept for primary actions) */
+/* (hover takes a tint of the theme colour, so the theme is felt everywhere) */
+.btn-outline-secondary, .btn-light {
+  --bs-btn-color: var(--color-text-soft); --bs-btn-bg: var(--color-fill); --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: var(--brand-primary); --bs-btn-hover-bg: var(--brand-primary-50); --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-color: var(--brand-primary); --bs-btn-active-bg: var(--brand-primary-100); --bs-btn-active-border-color: transparent;
+  --bs-btn-disabled-color: var(--color-muted); --bs-btn-disabled-bg: var(--color-fill); --bs-btn-disabled-border-color: transparent;
+}
+.btn-danger {
+  --bs-btn-color: var(--color-on-brand); --bs-btn-bg: var(--danger); --bs-btn-border-color: var(--danger);
+  --bs-btn-hover-color: var(--color-on-brand); --bs-btn-hover-bg: var(--danger-700); --bs-btn-hover-border-color: var(--danger-700);
+  --bs-btn-active-color: var(--color-on-brand); --bs-btn-active-bg: var(--danger-700); --bs-btn-active-border-color: var(--danger-700);
+  --bs-btn-disabled-color: var(--color-on-brand); --bs-btn-disabled-bg: var(--danger); --bs-btn-disabled-border-color: var(--danger);
+  --bs-btn-focus-box-shadow: 0 0 0 0.2rem rgba(var(--danger-rgb), 0.25);
+}
+/* Destructive secondary action: soft red tint, no border */
+.btn-outline-danger {
+  --bs-btn-color: var(--danger); --bs-btn-bg: var(--danger-bg); --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: var(--danger-700); --bs-btn-hover-bg: var(--danger-border); --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-color: var(--danger-700); --bs-btn-active-bg: var(--danger-border); --bs-btn-active-border-color: transparent;
+  --bs-btn-disabled-color: var(--danger); --bs-btn-disabled-bg: var(--danger-bg); --bs-btn-disabled-border-color: transparent;
+  --bs-btn-focus-box-shadow: 0 0 0 0.2rem rgba(var(--danger-rgb), 0.25);
+}
+.btn-success {
+  --bs-btn-color: var(--color-on-brand); --bs-btn-bg: var(--success); --bs-btn-border-color: var(--success);
+  --bs-btn-hover-color: var(--color-on-brand); --bs-btn-hover-bg: var(--success); --bs-btn-hover-border-color: var(--success);
+  --bs-btn-disabled-bg: var(--success); --bs-btn-disabled-border-color: var(--success);
+}
+.btn-link { --bs-btn-color: var(--brand-primary); --bs-btn-hover-color: var(--brand-primary-700); --bs-btn-active-color: var(--brand-primary-800); --bs-btn-disabled-color: var(--color-muted); text-decoration: none; }
+/* Square icon-only button used in table action columns */
+.btn-icon { --bs-btn-padding-x: 0; --bs-btn-padding-y: 0; width: 36px; height: 36px; display: inline-grid; place-items: center; --bs-btn-color: var(--color-muted); --bs-btn-bg: transparent; --bs-btn-border-color: transparent; --bs-btn-hover-color: var(--brand-primary); --bs-btn-hover-bg: var(--brand-primary-50); --bs-btn-hover-border-color: transparent; --bs-btn-active-bg: var(--brand-primary-100); --bs-btn-active-border-color: transparent; --bs-btn-disabled-color: var(--color-border-strong); --bs-btn-disabled-border-color: transparent; }
+.btn-icon.danger { --bs-btn-hover-color: var(--danger); --bs-btn-hover-bg: var(--danger-bg); --bs-btn-active-bg: var(--danger-bg); }
+.btn-close { --bs-btn-close-focus-shadow: var(--focus-ring); }
+/* Touch screens: small buttons and page numbers get a 36px minimum tap area */
+@media (pointer: coarse) {
+  .btn-sm, .page-link, .btn-icon { min-height: 36px; min-width: 36px; }
+}
+
+/* Loading button: the idle and busy labels share ONE grid cell, so the button keeps the width of the
+   wider label and never changes size when the spinner appears (no layout shift). */
+.btn-loading-stack { display: inline-grid; }
+.btn-loading-stack > span { grid-area: 1 / 1; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); }
+.btn-loading-stack > .is-hidden { visibility: hidden; }
+
+/* ---------- Forms ---------- */
+/* FILLED inputs: a light neutral fill and no visible border; the border + focus ring appear on
+   hover / focus only. The fill switches to white while typing, so the text stands out. */
+.form-control, .form-select { min-height: var(--control-h); font-size: var(--fs-base); border-color: transparent; border-radius: var(--radius-control); background-color: var(--color-fill); color: var(--color-text); transition: border-color var(--ease), box-shadow var(--ease), background-color var(--ease); }
+textarea.form-control { min-height: 0; }
+.form-control:hover, .form-select:hover { border-color: var(--color-border-strong); }
+.form-control::placeholder { color: var(--color-muted); opacity: 1; }
+.form-control:focus, .form-select:focus { border-color: var(--brand-primary); background-color: var(--color-surface); box-shadow: var(--focus-ring); }
+.form-control:disabled, .form-select:disabled { background-color: var(--color-fill); opacity: 0.7; }
+.form-control.is-invalid, .form-select.is-invalid { border-color: var(--danger); }
+.form-control-sm, .form-select-sm { border-radius: var(--radius-sm); min-height: var(--control-h-sm); font-size: var(--fs-sm); }
+.form-label { font-weight: 500; font-size: var(--fs-sm); margin-bottom: var(--space-1); }
+legend.form-label { float: none; font-size: var(--fs-sm); } /* fieldset legends look like normal labels */
+.form-text { color: var(--color-muted); }
+/* Character counter under a field (components/FieldLimit.jsx) */
+.field-limit { display: flex; justify-content: space-between; gap: var(--space-2); margin-top: var(--space-1); font-size: 0.8rem; color: var(--color-muted); }
+.field-limit.is-full { color: var(--danger-soft); }
+/* "Unsaved changes" hint next to the Save button */
+.dirty-hint { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--color-muted); }
+.dirty-hint::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+.form-check-input { border-color: var(--color-border-strong); }
+.form-check-input:checked { background-color: var(--brand-primary); border-color: var(--brand-primary); }
+.form-check-input:focus { border-color: var(--brand-primary); box-shadow: var(--focus-ring); }
+/* Search boxes: the icon sits inside the same fill as the input */
+.input-group-text { background: var(--color-fill); border-color: transparent; color: var(--color-muted); }
+.input-group:focus-within .input-group-text { background: var(--color-surface); border-color: var(--brand-primary); }
+
+/* ---------- Bootstrap components mapped to the brand ---------- */
+.pagination {
+  --bs-pagination-color: var(--brand-primary); --bs-pagination-bg: var(--color-surface); --bs-pagination-border-color: var(--color-border);
+  --bs-pagination-hover-color: var(--brand-primary-700); --bs-pagination-hover-bg: var(--brand-primary-50); --bs-pagination-hover-border-color: var(--color-border);
+  --bs-pagination-focus-color: var(--brand-primary-700); --bs-pagination-focus-bg: var(--brand-primary-50); --bs-pagination-focus-box-shadow: var(--focus-ring);
+  --bs-pagination-active-color: var(--color-on-brand); --bs-pagination-active-bg: var(--brand-primary); --bs-pagination-active-border-color: var(--brand-primary);
+  --bs-pagination-disabled-color: var(--color-muted); --bs-pagination-disabled-bg: var(--color-surface); --bs-pagination-disabled-border-color: var(--color-border);
+  --bs-pagination-border-radius: var(--radius-sm);
+}
+.nav-pills { --bs-nav-pills-link-active-bg: var(--brand-primary); --bs-nav-pills-link-active-color: var(--color-on-brand); --bs-nav-link-color: var(--color-muted); --bs-nav-link-hover-color: var(--brand-primary); --bs-nav-pills-border-radius: var(--radius-control); }
+.nav-underline { --bs-nav-link-color: var(--color-muted); --bs-nav-link-hover-color: var(--color-text); --bs-nav-underline-link-active-color: var(--brand-primary); --bs-nav-link-font-weight: 500; --bs-nav-link-font-size: var(--fs-base); --bs-nav-underline-gap: 1.25rem; }
+.dropdown-menu {
+  --bs-dropdown-bg: var(--color-surface); --bs-dropdown-border-color: var(--color-border); --bs-dropdown-border-radius: var(--radius-control);
+  --bs-dropdown-link-color: var(--color-text); --bs-dropdown-link-hover-color: var(--brand-primary); --bs-dropdown-link-hover-bg: var(--brand-primary-50);
+  --bs-dropdown-link-active-color: var(--brand-primary); --bs-dropdown-link-active-bg: var(--brand-primary-100);
+  --bs-dropdown-font-size: 0.9rem; box-shadow: var(--shadow-overlay);
+}
+.modal { --bs-modal-padding: 1.25rem; --bs-modal-header-padding: 0.9rem 1.25rem; --bs-modal-footer-gap: 0.4rem; --bs-modal-bg: var(--color-surface); --bs-modal-border-color: var(--color-border); --bs-modal-border-radius: var(--radius-card); --bs-modal-header-border-color: var(--color-border); --bs-modal-footer-border-color: var(--color-border); --bs-modal-box-shadow: var(--shadow-overlay); }
+.modal-content { box-shadow: var(--shadow-overlay); }
+.modal-title { font-weight: 600; font-size: var(--fs-md); }
+.modal-backdrop { --bs-backdrop-bg: var(--color-text); --bs-backdrop-opacity: 0.45; }
+/* A modal opened ON TOP of another modal (e.g. "Delete?" over the book details) */
+.modal.modal-stacked, .modal.modal-level-1 { z-index: 1065; }
+.modal-backdrop.modal-backdrop-stacked, .modal-backdrop.modal-backdrop-level-1 { z-index: 1060; }
+/* Level 2: e.g. Member details -> Transaction details -> Book details */
+.modal.modal-level-2 { z-index: 1075; }
+.modal-backdrop.modal-backdrop-level-2 { z-index: 1070; }
+/* Always on top: confirmations ("Are you sure?") and the image zoom */
+.modal.modal-top { z-index: 1085; }
+.modal-backdrop.modal-backdrop-top { z-index: 1080; }
+.offcanvas { --bs-offcanvas-bg: var(--color-surface); --bs-offcanvas-border-color: var(--color-border); --bs-offcanvas-box-shadow: var(--shadow-overlay); box-shadow: var(--shadow-overlay); }
+.offcanvas-title { font-weight: 600; font-size: var(--fs-md); }
+.tooltip { --bs-tooltip-bg: var(--color-text); --bs-tooltip-color: var(--color-surface); --bs-tooltip-font-size: 0.8rem; --bs-tooltip-border-radius: var(--radius-sm); }
+.table { --bs-table-color: var(--color-text); --bs-table-bg: var(--color-surface); --bs-table-border-color: var(--color-border); --bs-table-hover-bg: var(--hover-tint); --bs-table-hover-color: var(--color-text); }
+.alert-danger { --bs-alert-color: var(--danger); --bs-alert-bg: var(--danger-bg); --bs-alert-border-color: var(--danger-border); }
+.alert-warning { --bs-alert-color: var(--warning); --bs-alert-bg: var(--warning-bg); --bs-alert-border-color: var(--warning-border); }
+.alert-info { --bs-alert-color: var(--info); --bs-alert-bg: var(--info-bg); --bs-alert-border-color: var(--info-border); }
+.alert { --bs-alert-border-radius: var(--radius-control); --bs-alert-border-color: transparent; font-size: var(--fs-base); }
+.spinner-border-sm { --bs-spinner-border-width: 0.15em; }
+
+/* ---------- Skeletons (react-loading-skeleton), themed with our tokens ---------- */
+.react-loading-skeleton { --base-color: var(--skeleton-base); --highlight-color: var(--skeleton-highlight); }
+
+/* ---------- Toasts (bottom-right, flat with a coloured edge) ---------- */
+/* Bottom-right never covers the page header buttons. env(safe-area-inset-bottom) adds room for the
+   phone's home bar / browser toolbar, so a toast is never hidden behind it. */
+.toast-stack {
+  z-index: 1090;
+  padding: 0 var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+}
+/* Phones: full width along the bottom edge */
+@media (max-width: 575.98px) {
+  .toast-stack { left: 0; padding: 0 var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); }
+  .toast-stack .app-toast { width: 100%; }
+}
+.app-toast { --bs-toast-bg: var(--color-surface); --bs-toast-border-color: var(--color-border); --bs-toast-border-radius: var(--radius-control); --bs-toast-box-shadow: var(--shadow-overlay); --bs-toast-color: var(--color-text); border-left: 4px solid var(--success); }
+.app-toast.tone-error { border-left-color: var(--danger); }
+/* Smooth entrance and exit. react-bootstrap adds the class "showing" while a toast is entering and
+   leaving; here it starts slightly lower and transparent, then slides up into place (and back down). */
+.app-toast.fade { transition: opacity 240ms ease, transform 240ms ease; }
+.app-toast.showing { opacity: 0; transform: translateY(12px); }
+.app-toast .toast-body { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+.app-toast .toast-icon { flex: none; margin-top: 2px; color: var(--success); }
+.app-toast.tone-error .toast-icon { color: var(--danger); }
+
+/* ---------- Auth pages (login / register) ---------- */
+.auth-wrap { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; background: var(--color-surface); }
+.auth-art { position: relative; background: var(--brand-primary); display: flex; flex-direction: column; justify-content: flex-end; padding: 3rem; color: var(--color-on-brand); }
+.auth-art::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--brand-accent); } /* gold accent bar */
+.auth-art .brand { position: absolute; top: 2.5rem; left: 3rem; font-size: 1.4rem; color: var(--color-on-brand); }
+.auth-art .brand-dot { color: var(--brand-accent); } /* gold on NU blue is fine (6.9:1) */
+.auth-art h1 { font-size: 2.25rem; font-weight: 600; max-width: 14ch; color: var(--color-on-brand); }
+.auth-art p { color: var(--sidebar-text); max-width: 36ch; margin-bottom: 0; }
+.shelf { display: flex; align-items: flex-end; gap: var(--space-1); border-bottom: 6px solid var(--brand-accent); margin-bottom: 2rem; padding: 0 var(--space-1); }
 .spine { border-radius: 2px 2px 0 0; }
+.spine.tone-gold { background: var(--brand-accent); }
+.spine.tone-gold-dark { background: var(--brand-accent-600); }
+.spine.tone-light { background: var(--color-surface); }
+.spine.tone-tint { background: var(--brand-primary-100); }
+.spine.tone-soft { background: var(--brand-primary-50); }
 .auth-form { display: flex; align-items: center; justify-content: center; padding: 2rem; }
 .auth-form form { width: 100%; max-width: 380px; }
-@media (max-width: 768px) {
+.auth-form h2 { font-size: 1.5rem; }
+@media (max-width: 767.98px) {
   .auth-wrap { grid-template-columns: 1fr; }
-  .auth-art { padding: 1.5rem; min-height: 220px; }
-  .auth-art h1 { font-size: 1.6rem; }
+  .auth-art { padding: 4.5rem 1.5rem 1.5rem; min-height: 240px; }
+  .auth-art .brand { top: 1.5rem; left: 1.5rem; }
+  .auth-art h1 { font-size: 1.5rem; }
   .shelf { margin-bottom: 1rem; }
+  .shelf .spine:nth-child(n+7) { display: none; }
 }
-@media (max-width: 576px) { .book-row { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Respect the user's "reduce motion" setting: no animations or transitions */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}

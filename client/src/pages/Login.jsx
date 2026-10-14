@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { errMsg } from '../api';
 import AuthLayout from '../components/AuthLayout';
+import LoadingButton from '../components/LoadingButton';
 
 export default function Login() {
   const { user, login } = useAuth();
@@ -34,6 +35,8 @@ export default function Login() {
       await login(form.email, form.password);
       navigate('/');
     } catch (err) {
+      // Also shows the 429 answer "Too many failed attempts. Try again in 14 minutes." The button is
+      // never locked here: after that time the server accepts attempts again.
       setServerError(errMsg(err));
     } finally { setBusy(false); }
   };
@@ -42,7 +45,7 @@ export default function Login() {
     <AuthLayout>
       <form onSubmit={handleSubmit} noValidate>
         <h2 className="mb-1">Log in</h2>
-        <p className="meta mb-4">Welcome back. Log in to see your loans.</p>
+        <p className="meta mb-4">Log in with your library account.</p>
         {serverError && <div className="alert alert-danger py-2" role="alert">{serverError}</div>}
         <div className="mb-3">
           <label htmlFor="email" className="form-label">Email</label>
@@ -54,7 +57,7 @@ export default function Login() {
           <input id="password" name="password" type="password" className={`form-control ${errors.password ? 'is-invalid' : ''}`} value={form.password} onChange={handleChange} autoComplete="current-password" />
           <div className="invalid-feedback">{errors.password}</div>
         </div>
-        <button className="btn btn-primary w-100" disabled={busy}>{busy ? 'Logging in...' : 'Log in'}</button>
+        <LoadingButton type="submit" variant="primary" className="w-100" loading={busy} loadingText="Logging in...">Log in</LoadingButton>
         <p className="mt-3 mb-0 meta">New here? <Link to="/register">Create an account</Link></p>
       </form>
     </AuthLayout>

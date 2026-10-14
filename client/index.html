@@ -4,9 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stacks - Library Management</title>
+    <!-- Apply the last chosen colour theme BEFORE the app loads, so the page never flashes in the
+         default colours on refresh. The login/register pages always use the default theme.
+         The server's saved theme wins once the app has loaded (/api/auth/me). -->
+    <script>
+      try {
+        var t = localStorage.getItem('stacks.theme');
+        var authPage = /^\/(login|register)/.test(location.pathname);
+        if (t && /^[a-z-]{3,30}$/.test(t) && !authPage) document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

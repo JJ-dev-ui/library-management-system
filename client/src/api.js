@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api' });
+// Base address of the API (also used to build <img> links such as /api/books/:id/cover)
+export const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const api = axios.create({ baseURL: API_BASE });
 
 // Attach the JWT to every request
 api.interceptors.request.use((config) => {

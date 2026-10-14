@@ -1,2 +1,4 @@
 node_modules
 .env
+# temporary cache used by the book import script
+data/.import-cache.json

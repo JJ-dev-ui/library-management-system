@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api';
+import { applyTheme, DEFAULT_THEME } from '../utils/theme';
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
@@ -18,6 +19,13 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
+  // The theme saved on the server wins (index.html already applied the last one from this browser).
+  // Runs when the user logs in, or saves a new theme in Settings.
+  const savedTheme = user?.preferences?.theme;
+  useEffect(() => {
+    if (savedTheme) applyTheme(savedTheme);
+  }, [savedTheme]);
+
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.setItem('token', data.token);
@@ -32,11 +40,15 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('token');
+    applyTheme(DEFAULT_THEME); // the next person on this computer starts with the default colours
     setUser(null);
   };
 
+  // After a password change the server sends a NEW token (the old ones stop working)
+  const replaceToken = (token) => localStorage.setItem('token', token);
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, isAdmin: user?.role === 'admin' }}>
+    <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, replaceToken, isAdmin: user?.role === 'admin' }}>
       {children}
     </AuthContext.Provider>
   );
